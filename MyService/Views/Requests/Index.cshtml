@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Domin.Entity.Request>
+
+@{
+    ViewData["Title"] = "طلبات الخدمات";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 text-primary">
+            <i class="bi bi-clipboard2-check"></i> طلبات الخدمات
+        </h1>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRequestModal">
+            <i class="bi bi-plus-circle"></i> إضافة طلب جديد
+        </button>
+    </div>
+
+    <!-- إحصائيات الطلبات -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-list-task"></i> إجمالي الطلبات
+                    </h5>
+                    <div class="display-4 text-primary">@Model.Count()</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قائمة الطلبات -->
+    <div class="row g-4">
+        @foreach (var request in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card request-card shadow-sm h-100">
+                    <div class="card-header bg-light d-flex justify-content-between">
+                        <span class="badge @GetStatusBadgeClass(request.Status)">
+                            @(request.Status ? "مكتمل" : "قيد الانتظار")
+                        </span>
+                        <small class="text-muted">#@request.RequestId</small>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">
+                            <i class="bi bi-tools"></i> @request.Service.Name
+                        </h5>
+                        <div class="mb-3">
+                            <div class="fw-bold">المزود:</div>
+                            <div class="text-muted">@request.Provider.ProviderName</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="fw-bold">التاريخ:</div>
+                            <div class="text-muted">@request.OrderDate.ToString("yyyy/MM/dd")</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(request.Comment))
+                        {
+                            <div class="alert alert-light">
+                                <i class="bi bi-chat-left-text"></i> @request.Comment
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> تعديل
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- مودال إضافة طلب -->
+<div class="modal fade" id="addRequestModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> طلب خدمة جديدة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">الخدمة المطلوبة</label>
+                        <select class="form-select" name="ServiceId" required>
+                            <option value="">اختر الخدمة</option>
+                            @foreach (var service in ViewBag.Services)
+                            {
+                                <option value="@service.ServiceId">@service.ServiceName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">اختر المزود</label>
+                        <select class="form-select" name="ProviderId" required>
+                            <option value="">اختر المزود</option>
+                            @foreach (var provider in ViewBag.Providers)
+                            {
+                                <option value="@provider.ProviderId">@provider.ProviderName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ملاحظات إضافية</label>
+                        <textarea class="form-control" name="Comment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ الطلب</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+<style>
+    .request-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.125);
+    }
+    .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .badge-status {
+        font-size: 0.9em;
+        padding: 0.5em 0.75em;
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+    // Initialize Bootstrap validation
+    (() => {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+}
+
+@functions {
+    string GetStatusBadgeClass(bool status)
+    {
+        return status ? "bg-success" : "bg-warning text-dark";
+    }
+}

@@ -1,0 +1,144 @@
+﻿@model ServiceViewModel
+
+@{
+    ViewData["Title"] = "Service";
+}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+     <partial name="_Natification" />  
+
+<div class="wrapper">
+
+
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@ResourceWeb.lbManagService</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
+                        <li class="breadcrumb-item active">@ResourceWeb.lbManagService</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- service Table -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary float-right" data-bs-toggle="modal" onclick="Rest()" data-bs-target="#serviceModal">@ResourceWeb.lbAddPage</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover" id="servicesId">
+                            <thead>
+                                <tr>
+                                    <th>@ResourceWeb.htName</th>
+                                    <th>@ResourceWeb.lbDescriptionService</th>
+                                    <th>@ResourceWeb.htDate</th>
+                                    <th>@ResourceWeb.htStatue</th>
+                                    <th>@ResourceWeb.htAction</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.services.Any())
+                                {
+                                    foreach (var service in Model.services)
+                                    {
+                                                        <tr>
+                                                            <td>@service.Name</td>
+                                                            <td>@service.Description</td>
+                                                            <td>@service.CreatedAt</td>
+                                                       <td><input type="checkbox" disabled checked="@service.IsActive" style="width:35px; height:35px" ></td>
+
+
+                                                    <td>
+<td>
+                                                        <button class="btn btn-sm btn-info"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#serviceModal"
+onclick="Editservice('@service.ServiceID','@service.Name','@service.Description','@service.CreatedAt','@service.IsActive')"                                                    >
+                                                    @ResourceWeb.lbbtnEdit
+                                                                </button>
+                                                                <form method="post" asp-action="DeleteService" asp-controller="Service" style="display:inline;">
+                                                                    <input type="hidden" name="id" value="@service.ServiceID" />
+                                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                            <tr>
+                                                <td colspan="7" class="text-center">لايوجد</td>
+                                            </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Add/Edit service -->
+    <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog card card-success card-outline">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serviceModalLabel">@ResourceWeb.lbAddService</h5>
+                    <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</a>
+                </div>
+                <div class="modal-body">
+                   <form method="post" asp-action="Service" asp-controller="Service">
+    <input type="hidden" asp-for="NewService.ServiceID" id="ServiceId" />
+    <input type="hidden" asp-for="NewService.IsActive" value="false" />
+    <!-- Other form fields -->
+            <div class="mb-3">
+                            <label asp-for="NewService.Name" class="form-label">@ResourceWeb.htName</label>
+                            <input asp-for="NewService.Name" type="text" class="form-control" id="Name"  />
+                            <span asp-validation-for="NewService.Name" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewService.Description" class="form-label">@ResourceWeb.lbDescriptionService</label>
+                            <input asp-for="NewService.Description" type="text" class="form-control" id="Description"  />
+                            <span asp-validation-for="NewService.Description" class="text-danger"></span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="NewService.CreatedAt" class="form-label">@ResourceWeb.htDate</label>
+                            <input asp-for="NewService.CreatedAt" type="date" class="form-control" id="CreatedAt"  />
+                            <span asp-validation-for="NewService.CreatedAt" class="text-danger"></span>
+
+                        </div>
+
+                         <div class="form-group">
+                            <label asp-for="NewService.IsActive" class="control-lable">@ResourceWeb.lbActiveUser</label>
+                            <input type="checkbox" class="form-control" asp-for="NewService.IsActive" id="IsActive" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">@ResourceWeb.lbbtnSave</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/Modules/Service.js"></script>
+
+<script>
+    let lbTitleEdit = '@Html.Raw(ResourceWeb.lbAddService)';
+    let lbTitleAdd = '@Html.Raw(ResourceWeb.lbUpdateService)';
+</script>
+}

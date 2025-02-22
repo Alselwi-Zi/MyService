@@ -1,0 +1,199 @@
+﻿@model RegisterCustomerViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>AdminLTE 3 | Log in</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/Admin/plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="~/Admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Admin/dist/css/adminlte.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+<body class="hold-transition register-page">
+    <div class="register-box">
+        <div class="register-logo">
+            <a href="#"><b>Admin</b>LTE</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body register-card-body">
+                <p class="login-box-msg">Register a new membership</p>
+
+                <form asp-action="Registers" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- User Information Section -->
+                    <div class="input-group mb-3">
+                        <input asp-for="RegisterCustomer.Name" class="form-control" placeholder="Full name">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RegisterCustomer.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="RegisterCustomer.Email" class="form-control" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RegisterCustomer.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password Section -->
+                    <div class="input-group mb-3">
+                        <input asp-for="RegisterCustomer.Password" class="form-control" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RegisterCustomer.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="RegisterCustomer.ComparePassword" class="form-control" placeholder="Confirm password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RegisterCustomer.ComparePassword" class="text-danger"></span>
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="input-group mb-3">
+                        <select asp-for="RegisterCustomer.RoleName" class="form-control">
+                            <option value="">Select Role</option>
+                            <option value="Basic">Basic</option>
+                        </select>
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user-tag"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RegisterCustomer.RoleName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Active User Toggle -->
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input asp-for="RegisterCustomer.ActiveUser" type="checkbox" id="agreeTerms">
+                            <label for="agreeTerms">
+                                Active User
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                                <label for="agreeTerms">
+                                    I agree to the <a href="#">terms</a>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="social-auth-links text-center">
+                    <p>- OR -</p>
+                    <a href="#" class="btn btn-block btn-primary">
+                        <i class="fab fa-facebook mr-2"></i> Sign up using Facebook
+                    </a>
+                    <a href="#" class="btn btn-block btn-danger">
+                        <i class="fab fa-google-plus mr-2"></i> Sign up using Google+
+                    </a>
+                </div>
+
+                <a asp-action="Login" class="text-center">I already have a membership</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+
+</body>
+</html>
+
+
+                           [AllowAnonymous]
+        public IActionResult Registers()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+
+        public async Task<IActionResult>
+    Registers(RegisterCustomerViewModel model)
+    {
+    // Retrieve the existing user by email.
+    var existingUser = await _userManager.FindByEmailAsync(model.RegisterCustomer.Email);
+
+    // Check if a user with the given email exists.
+    if (existingUser != null)
+    {
+    // The email already exists. Add a model error and return the view.
+    ModelState.AddModelError("RegisterCustomer.Email", "This email is already registered. Please use another email address.");
+    return View(model);
+    }
+
+    IFormFile file = null;
+    var user = new ApplicationUser
+    {
+    Id = model.RegisterCustomer.Id,
+    Name = model.RegisterCustomer.Name,
+    UserName = model.RegisterCustomer.Email,
+    Email = model.RegisterCustomer.Email,
+    ActiveUser = model.RegisterCustomer.ActiveUser,
+    ImageUser = await HandleImageUpload(file) // دالة معالجة الصورة
+
+
+
+    };
+    if (user.Id == null)
+    {
+    //Craete
+    user.Id = Guid.NewGuid().ToString();
+    var result = await _userManager.CreateAsync(user, model.RegisterCustomer.Password);
+    if (result.Succeeded)
+    {
+    //Succsseded
+    var Role = await _userManager.AddToRoleAsync(user, model.RegisterCustomer.RoleName);
+    if (Role.Succeeded)
+    SessionMsg(Helper.Success, Resource.ResourceWeb.lbSave, Resource.ResourceWeb.lbNotSavedMsgUserRole);
+    else
+    SessionMsg(Helper.Error, Resource.ResourceWeb.lbNotSaved, Resource.ResourceWeb.lbNotSavedMsgUser);
+    }
+    else //Not Successeded
+    SessionMsg(Helper.Error, Resource.ResourceWeb.lbNotSaved, Resource.ResourceWeb.lbNotUpdateMsgUser);
+    }
+
+    return RedirectToAction("Login", "Customer");
+
+    }

@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domin", "Domin\Domin.csproj", "{EFB156F2-B35E-42B1-9A7E-14DDC7AE85B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infarstuructre", "Infarstuructre\Infarstuructre.csproj", "{E77A5165-AB32-47AC-8503-37F9D081D5A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyService", "MyService\MyService.csproj", "{FAA96A4D-91A3-4156-9CDC-33C74DCDAD4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFB156F2-B35E-42B1-9A7E-14DDC7AE85B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB156F2-B35E-42B1-9A7E-14DDC7AE85B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB156F2-B35E-42B1-9A7E-14DDC7AE85B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB156F2-B35E-42B1-9A7E-14DDC7AE85B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E77A5165-AB32-47AC-8503-37F9D081D5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E77A5165-AB32-47AC-8503-37F9D081D5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E77A5165-AB32-47AC-8503-37F9D081D5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E77A5165-AB32-47AC-8503-37F9D081D5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAA96A4D-91A3-4156-9CDC-33C74DCDAD4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAA96A4D-91A3-4156-9CDC-33C74DCDAD4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAA96A4D-91A3-4156-9CDC-33C74DCDAD4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAA96A4D-91A3-4156-9CDC-33C74DCDAD4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2CC889E-E2A0-48F4-9565-83E6D7F317C4}
+	EndGlobalSection
+EndGlobal

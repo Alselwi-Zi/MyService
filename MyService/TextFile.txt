@@ -1,0 +1,372 @@
+﻿@model EmployeesViewModel
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<div class="wrapper">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@ResourceWeb.lbManageEmployees</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
+                        <li class="breadcrumb-item active">@ResourceWeb.lbManageEmployees</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Table -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary float-right" data-bs-toggle="modal" onclick="Rest()" data-bs-target="#employeeModal">@ResourceWeb.lbAddPage</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover" id="employeesId">
+                            <thead>
+                                <tr>
+                                    <th>@ResourceWeb.htName</th>
+                                    <th>@ResourceWeb.htEmail</th>
+                                    <th>@ResourceWeb.htPhone</th>
+                                    <th>@ResourceWeb.htDate</th>
+                                    <th>@ResourceWeb.htStatue</th>
+                                    <th>@ResourceWeb.htFilecv</th>
+                                    <th>@ResourceWeb.htAction</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Employees.Any())
+                                {
+                                    foreach (var employee in Model.Employees)
+                                    {
+                                        <tr>
+                                            <td>@employee.Name</td>
+                                            <td>@employee.Email</td>
+                                            <td>@employee.PhoneNumber</td>
+                                            <td>@employee.Created</td>
+                                            <td>@employee.CurrentStatus</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(employee.TitleResume))
+                                                {
+                                                    <a href="@Url.Action("DownloadFile", "Employees", new { fileName = employee.TitleResume })" target="_blank">Download</a> <span>|</span>
+                                                    <a id="ResumeLink" onclick="ViewResume('@employee.TitleResume')" href="#" target="_blank">View</a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badget badge-pill">لايوجد</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#employeeModal"
+                                                onclick="EditEmployee('@employee.Id','@employee.Name','@employee.Email','@employee.PhoneNumber','@employee.Created','@employee.CurrentStatus','@employee.TitleResume')"
+                                                    >
+                                                    @ResourceWeb.lbbtnEdit
+                                                </button>
+                                                <form method="post" asp-action="DeleteEmployee" asp-controller="Employees" style="display:inline;">
+                                                    <input type="hidden" name="id" value="@employee.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center">لايوجد</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Add/Edit Employee -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog card card-success card-outline">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalLabel">@ResourceWeb.titleEmployeeAdd</h5>
+                    <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</a>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="SaveEmployee" asp-controller="Employees">
+                        <input type="hidden"   asp-for="NewEmployees.Id" id="EmployeeId" />
+
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Name" class="form-label">@ResourceWeb.htName</label>
+                            <input asp-for="NewEmployees.Name" type="text" class="form-control" id="Name"  />
+                            <span asp-validation-for="NewEmployees.Name" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Email" class="form-label">@ResourceWeb.htEmail</label>
+                            <input asp-for="NewEmployees.Email" type="email" class="form-control" id="Email"  />
+                            <span asp-validation-for="NewEmployees.Email" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Phone" class="form-label">@ResourceWeb.htPhone</label>
+                            <input asp-for="NewEmployees.Phone" type="text" class="form-control" id="Phone"  />
+                            <span asp-validation-for="NewEmployees.Phone" class="text-danger"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Date" class="form-label">@ResourceWeb.htDate</label>
+                            <input asp-for="NewEmployees.Date" type="date" class="form-control" id="date"  />
+                            <span asp-validation-for="NewEmployees.Date" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.CurrentStatue" class="form-label">@ResourceWeb.htStatue</label>
+                            <input asp-for="NewEmployees.CurrentStatue" type="number" class="form-control" id="Statue" />
+                            <span asp-validation-for="NewEmployees.CurrentStatue" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.TitleResume"  class="form-label">@ResourceWeb.htFilecv</label>
+                            <input asp-for="NewEmployees.TitleResume" type="file" class="form-control" id="Resume" />
+
+                        </div>
+                        <button type="submit" class="btn btn-primary">@ResourceWeb.lbbtnSave</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/Modules/Employees.js"></script>
+
+<script>
+    let lbTitleEdit = '@Html.Raw(ResourceWeb.titleEmployeeُEidte)';
+    let lbTitleAdd = '@Html.Raw(ResourceWeb.titleEmployeeAdd)';
+    let PathResum = '@Html.Raw(Helper.PathResume)';
+</script>
+}
+using Domin.Entity;
+using Infarstuructre.Data;
+using Infarstuructre.ViewModel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace EmployeesController.Controllers
+{
+    [Area("Admin")]
+
+    public class EmployeesController : Controller
+    {
+        private readonly MyServiceDbContext _context;
+
+        public EmployeesController(MyServiceDbContext context)
+        {
+            _context = context;
+        }
+
+        public  IActionResult Index()
+        {
+            var model = new EmployeesViewModel
+            {
+                NewEmployees = new NewEmployees(),
+                Employees=_context.employees.ToList()
+
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveEmployee(EmployeesViewModel model)
+        {
+           if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid data. Please check your input.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                var file = HttpContext.Request.Form.Files.FirstOrDefault();
+                string resumeFileName = null;
+
+                if (file != null)
+                {
+                    resumeFileName = SaveFile(file);
+                }
+               
+
+                if (model.NewEmployees.Id == 0) // Create new employee
+                {
+                    var newEmployee = new Employees
+                    {
+                        Name = model.NewEmployees.Name,
+                        Email = model.NewEmployees.Email,
+                        PhoneNumber = model.NewEmployees.Phone,
+                        Created = model.NewEmployees.Date,
+                        CurrentStatus = model.NewEmployees.CurrentStatue,
+                        TitleResume = model.NewEmployees.TitleResume??resumeFileName,
+                    };
+
+                    await _context.employees.AddAsync(newEmployee);
+                }
+                else // Update existing employee
+                {
+                    var employee = await _context.employees.FindAsync(model.NewEmployees.Id);
+                    if (employee.Id > 0)
+                    {
+
+                        employee.Name = model.NewEmployees.Name;
+                        employee.Email = model.NewEmployees.Email;
+                        employee.PhoneNumber = model.NewEmployees.Phone;
+                        employee.Created = model.NewEmployees.Date;
+                        employee.CurrentStatus = model.NewEmployees.CurrentStatue;
+                        employee.TitleResume = employee.TitleResume;
+
+                        _context.employees.Update(employee);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Employee saved successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            try
+            {
+                var employee = await _context.employees.FindAsync(id);
+                if (employee != null)
+                {
+                    _context.employees.Remove(employee);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Employee deleted successfully.";
+                }
+                else
+                {
+                    TempData["Error"] = "Employee not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        private string SaveFile(IFormFile file)
+        {
+            
+          
+
+            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Web/resumes");
+            Directory.CreateDirectory(uploadDir); // Ensure the directory exists
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate unique file name
+            var filePath = Path.Combine(uploadDir, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+
+            return fileName; 
+        }
+        [HttpGet]
+        public IActionResult DownloadFile(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return NotFound("File name not provided.");
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Web/resumes", fileName);
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("File not found.");
+
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite);
+            var fileType = "application/pdf"; 
+            return File(fileStream, fileType, fileName); 
+        }
+
+    }
+}
+
+$(document).ready(function () {
+    $('#employeesId').DataTable({
+        "autoWidth": false,
+        "responsive": true,
+        "language": {
+            "emptyTable": "لايوجد موظفين متاحين"
+        }
+    });
+});
+
+EditEmployee = (id, name, email, phone, date, statue, resume) => {
+    // Update the modal fields
+    document.getElementById("EmployeeId").value = id;
+    document.getElementById("Name").value = name;
+    document.getElementById("Email").value = email;
+    document.getElementById("Phone").value = phone;
+    document.getElementById("date").value = date.split('T')[0]; // تحويل التاريخ
+    document.getElementById("Statue").value = statue;
+    document.getElementById("Resume").src = PathResum + resume;
+    document.getElementById("employeeModalLabel").innerHTML = lbTitleEdit;
+    
+}
+
+function Rest() {
+    document.getElementById("EmployeeId").value = "";
+
+    document.getElementById("Name").value = "";
+    document.getElementById("Email").value = "";
+    document.getElementById("Phone").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("Statue").value = "";
+    document.getElementById("Resume").value = "";
+    document.getElementById("employeeModalLabel").innerHTML = lbTitleAdd;
+
+}
+function ViewResume (resume){
+    document.getElementById("ResumeLink").href = PathResum + resume;
+}
+
+
+
+The thread 'localhost:5001/User/Registers' (0) has exited with code 0 (0x0).
+The program 'JavaScript debug adapter: localhost:5001' has exited with code 4294967295 (0xffffffff).
+Extracted embedded document 'System.Threading\Monitor.cs' to 'C:\Users\Z\AppData\Local\Temp\.vsdbgsrc\470d3084ccff01cbfffdb653cdede89467eb744ee0ba266252d0a21e12cbf24b\Monitor.cs'

@@ -1,0 +1,178 @@
+﻿@model EmployeesViewModel
+
+@{
+    ViewData["Title"] = "Employees";
+}
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+      
+ <partial name="_Natification" />  
+
+<div class="wrapper">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@ResourceWeb.lbManageEmployees</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index">@ResourceWeb.lbHomePage</a></li>
+                        <li class="breadcrumb-item active">@ResourceWeb.lbManageEmployees</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Table -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary float-right" data-bs-toggle="modal" onclick="Rest()" data-bs-target="#employeeModal">@ResourceWeb.lbAddPage</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover" id="employeesId">
+                            <thead>
+                                <tr>
+                                    <th>@ResourceWeb.htName</th>
+                                    <th>@ResourceWeb.htEmail</th>
+                                    <th>@ResourceWeb.htPhone</th>
+                                    <th>@ResourceWeb.htDate</th>
+                                    <th>@ResourceWeb.htStatue</th>
+                                    <th>@ResourceWeb.htFilecv</th>
+                                    <th>@ResourceWeb.htAction</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Employees.Any())
+                                {
+                                    foreach (var employee in Model.Employees)
+                                    {
+                                        <tr>
+                                            <td>@employee.Name</td>
+                                            <td>@employee.Email</td>
+                                            <td>@employee.PhoneNumber</td>
+                                            <td>@employee.Created</td>
+                                       <td><input type="checkbox" disabled checked="@employee.IsActive" style="width:35px; height:35px" ></td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(employee.TitleResume))
+                                                {
+                                                    <a href="@Url.Action("DownloadFile", "Employees", new { fileName = employee.TitleResume })" target="_blank">Download</a> <span>|</span>
+                                                    <a id="ResumeLink" onclick="ViewResume('@employee.TitleResume')" href="#" target="_blank">View</a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badget badge-pill">لايوجد</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#employeeModal"
+                                                onclick="EditEmployee('@employee.Id','@employee.Name','@employee.Email','@employee.PhoneNumber','@employee.Created','@employee.IsActive','@employee.CurrentStatus','@employee.TitleResume')"
+                                                    >
+                                                    @ResourceWeb.lbbtnEdit
+                                                </button>
+                                                <form method="post" asp-action="DeleteEmployee" asp-controller="Employees" style="display:inline;">
+                                                    <input type="hidden" name="id" value="@employee.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center">لايوجد</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Add/Edit Employee -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog card card-success card-outline">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalLabel">@ResourceWeb.titleEmployeeAdd</h5>
+                    <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</a>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="SaveEmployee" asp-controller="Employees">
+                        <input type="hidden"   asp-for="NewEmployees.Id" id="EmployeeId" />
+
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Name" class="form-label">@ResourceWeb.htName</label>
+                            <input asp-for="NewEmployees.Name" type="text" class="form-control" id="Name"  />
+                            <span asp-validation-for="NewEmployees.Name" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Email" class="form-label">@ResourceWeb.htEmail</label>
+                            <input asp-for="NewEmployees.Email" type="email" class="form-control" id="Email"  />
+                            <span asp-validation-for="NewEmployees.Email" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Phone" class="form-label">@ResourceWeb.htPhone</label>
+                            <input asp-for="NewEmployees.Phone" type="text" class="form-control" id="Phone"  />
+                            <span asp-validation-for="NewEmployees.Phone" class="text-danger"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.Date" class="form-label">@ResourceWeb.htDate</label>
+                            <input asp-for="NewEmployees.Date" type="date" class="form-control" id="DateCreate"  />
+                            <span asp-validation-for="NewEmployees.Date" class="text-danger"></span>
+
+                        </div>
+                         <div class="form-group">
+                            <label asp-for="NewEmployees.IsActive" class="control-lable">@ResourceWeb.lbActiveUser</label>
+                            <input type="checkbox" class="form-control" asp-for="NewEmployees.IsActive" id="EmployeeActive" />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.CurrentStatue" class="form-label">@ResourceWeb.htStatue</label>
+                            <input asp-for="NewEmployees.CurrentStatue" type="number" class="form-control" id="Statue" />
+                            <span asp-validation-for="NewEmployees.CurrentStatue" class="text-danger"></span>
+
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="NewEmployees.TitleResume"  class="form-label">@ResourceWeb.htFilecv</label>
+                            <input asp-for="NewEmployees.TitleResume" type="file" class="form-control" id="Resume" />
+
+                        </div>
+                        <button type="submit" class="btn btn-primary">@ResourceWeb.lbbtnSave</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@ResourceWeb.lbcancelButtonText</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/Modules/Employees.js"></script>
+
+<script>
+    let lbTitleEdit = '@Html.Raw(ResourceWeb.titleEmployeeُEidte)';
+    let lbTitleAdd = '@Html.Raw(ResourceWeb.titleEmployeeAdd)';
+    let PathResum = '@Html.Raw(Helper.PathResume)';
+</script>
+}
