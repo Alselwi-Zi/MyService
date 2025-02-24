@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Prodaction"//"Development"
       }
     },
-    "WebBook": {
+    "MyService": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,

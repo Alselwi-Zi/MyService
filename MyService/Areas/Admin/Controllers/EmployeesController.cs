@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EmployeesController.Controllers
+namespace MyService.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class EmployeesController : Controller
@@ -40,7 +40,6 @@ namespace EmployeesController.Controllers
         public async Task<IActionResult> SaveEmployee(EmployeesViewModel model)
         {
           
-
 
                 try
                 {

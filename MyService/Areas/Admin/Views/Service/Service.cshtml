@@ -57,7 +57,7 @@
 
 
                                                     <td>
-<td>
+
                                                         <button class="btn btn-sm btn-info"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#serviceModal"
@@ -122,7 +122,7 @@ onclick="Editservice('@service.ServiceID','@service.Name','@service.Description'
 
                          <div class="form-group">
                             <label asp-for="NewService.IsActive" class="control-lable">@ResourceWeb.lbActiveUser</label>
-                            <input type="checkbox" class="form-control" asp-for="NewService.IsActive" id="IsActive" />
+                            <input type="checkbox" class="form-control" asp-for="NewService.IsActive" id="ServiceActive" />
                         </div>
 
                         <button type="submit" class="btn btn-primary">@ResourceWeb.lbbtnSave</button>

@@ -2,10 +2,12 @@
 
 @{
     ViewData["Title"] = "Employees";
+    Layout = "_Layoutadmin";
+
 }
  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
       
- <partial name="_Natification" />  
+
 
 <div class="wrapper">
     @if (TempData["Success"] != null)
