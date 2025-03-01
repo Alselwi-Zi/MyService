@@ -13,15 +13,13 @@ using System.Threading.Tasks;
 namespace MyService.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class EmployeesController : Controller
+    public class WorkersController : Controller
     {
         private readonly MyServiceDbContext _context;
-        private readonly ILogger<EmployeesController> _logger;
 
-        public EmployeesController(MyServiceDbContext context, ILogger<EmployeesController> logger)
+        public WorkersController(MyServiceDbContext context, ILogger<WorkersController> logger)
         {
             _context = context;
-            _logger = logger;
         }
 
         public IActionResult Index()
@@ -113,7 +111,6 @@ namespace MyService.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while saving an employee.");
                 TempData["Error"] = $"An unexpected error occurred: {ex.Message}";
             }
 
@@ -139,7 +136,6 @@ namespace MyService.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while deleting an employee.");
                 TempData["Error"] = $"An unexpected error occurred: {ex.Message}";
             }
 
@@ -170,7 +166,6 @@ namespace MyService.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while downloading a file.");
                 TempData["Error"] = $"An unexpected error occurred: {ex.Message}";
                 return RedirectToAction("Index");
             }
