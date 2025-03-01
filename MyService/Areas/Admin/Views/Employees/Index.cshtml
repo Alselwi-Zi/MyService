@@ -5,8 +5,8 @@
     Layout = "_Layoutadmin";
 
 }
- <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-      
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
 
 
 <div class="wrapper">
@@ -66,7 +66,7 @@
                                             <td>@employee.Email</td>
                                             <td>@employee.PhoneNumber</td>
                                             <td>@employee.Created</td>
-                                       <td><input type="checkbox" disabled checked="@employee.IsActive" style="width:35px; height:35px" ></td>
+                                            <td><input type="checkbox" disabled checked="@employee.IsActive" style="width:35px; height:35px"></td>
                                             <td>
                                                 @if (!string.IsNullOrEmpty(employee.TitleResume))
                                                 {
@@ -80,10 +80,9 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-info"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#employeeModal"
-                                                onclick="EditEmployee('@employee.Id','@employee.Name','@employee.Email','@employee.PhoneNumber','@employee.Created','@employee.IsActive','@employee.CurrentStatus','@employee.TitleResume')"
-                                                    >
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#employeeModal"
+                                                        onclick="EditEmployee('@employee.Id','@employee.Name','@employee.Email','@employee.PhoneNumber','@employee.Created','@employee.IsActive','@employee.CurrentStatus','@employee.TitleResume')">
                                                     @ResourceWeb.lbbtnEdit
                                                 </button>
                                                 <form method="post" asp-action="DeleteEmployee" asp-controller="Employees" style="display:inline;">
@@ -118,34 +117,34 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" enctype="multipart/form-data" asp-action="SaveEmployee" asp-controller="Employees">
-                        <input type="hidden"   asp-for="NewEmployees.Id" id="EmployeeId" />
+                        <input type="hidden" asp-for="NewEmployees.Id" id="EmployeeId" />
 
                         <div class="mb-3">
                             <label asp-for="NewEmployees.Name" class="form-label">@ResourceWeb.htName</label>
-                            <input asp-for="NewEmployees.Name" type="text" class="form-control" id="Name"  />
+                            <input asp-for="NewEmployees.Name" type="text" class="form-control" id="Name" />
                             <span asp-validation-for="NewEmployees.Name" class="text-danger"></span>
 
                         </div>
                         <div class="mb-3">
                             <label asp-for="NewEmployees.Email" class="form-label">@ResourceWeb.htEmail</label>
-                            <input asp-for="NewEmployees.Email" type="email" class="form-control" id="Email"  />
+                            <input asp-for="NewEmployees.Email" type="email" class="form-control" id="Email" />
                             <span asp-validation-for="NewEmployees.Email" class="text-danger"></span>
 
                         </div>
                         <div class="mb-3">
                             <label asp-for="NewEmployees.Phone" class="form-label">@ResourceWeb.htPhone</label>
-                            <input asp-for="NewEmployees.Phone" type="text" class="form-control" id="Phone"  />
+                            <input asp-for="NewEmployees.Phone" type="text" class="form-control" id="Phone" />
                             <span asp-validation-for="NewEmployees.Phone" class="text-danger"></span>
 
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="NewEmployees.Date" class="form-label">@ResourceWeb.htDate</label>
-                            <input asp-for="NewEmployees.Date" type="date" class="form-control" id="DateCreate"  />
+                            <input asp-for="NewEmployees.Date" type="date" class="form-control" id="DateCreate" />
                             <span asp-validation-for="NewEmployees.Date" class="text-danger"></span>
 
                         </div>
-                         <div class="form-group">
+                        <div class="form-group">
                             <label asp-for="NewEmployees.IsActive" class="control-lable">@ResourceWeb.lbActiveUser</label>
                             <input type="checkbox" class="form-control" asp-for="NewEmployees.IsActive" id="EmployeeActive" />
                         </div>
@@ -156,7 +155,7 @@
 
                         </div>
                         <div class="mb-3">
-                            <label asp-for="NewEmployees.TitleResume"  class="form-label">@ResourceWeb.htFilecv</label>
+                            <label asp-for="NewEmployees.TitleResume" class="form-label">@ResourceWeb.htFilecv</label>
                             <input asp-for="NewEmployees.TitleResume" type="file" class="form-control" id="Resume" />
 
                         </div>
@@ -170,11 +169,11 @@
 </div>
 
 @section Scripts {
-<script src="~/Modules/Employees.js"></script>
+    <script src="~/Modules/Employees.js"></script>
 
-<script>
-    let lbTitleEdit = '@Html.Raw(ResourceWeb.titleEmployeeُEidte)';
-    let lbTitleAdd = '@Html.Raw(ResourceWeb.titleEmployeeAdd)';
-    let PathResum = '@Html.Raw(Helper.PathResume)';
-</script>
+    <script>
+        let lbTitleEdit = '@Html.Raw(ResourceWeb.titleEmployeeُEidte)';
+        let lbTitleAdd = '@Html.Raw(ResourceWeb.titleEmployeeAdd)';
+        let PathResum = '@Html.Raw(Helper.PathResume)';
+    </script>
 }
