@@ -24,7 +24,6 @@ namespace MyService.Controllers
         {
             var viewModel = new RequestViewModel
             {
-                // Optionally, initialize OrderDate to today
                 OrderDate = DateTime.Today
             };
 
@@ -52,11 +51,20 @@ namespace MyService.Controllers
                 _context.Add(request);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = ResourceWeb.lbSuccess;
+                Notification notification = new Notification
+                {
+                    
+                    UserId = request.ProviderId,
+                    Message = request.Comment, 
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                };
 
+                _context.notifications.Add(notification);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
             }
 
-            // Reload dropdown lists if model validation fails
             await PopulateDropdownsAsync(viewModel);
             return View(viewModel);
         }
