@@ -8,11 +8,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 namespace MyService.Controllers
 {
+    [Authorize]
+
     public class CustomerController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -93,29 +97,28 @@ namespace MyService.Controllers
         // GET: Customer/Login
 
 
-        // GET: Account/EditProfile
+        [HttpGet]
         public async Task<IActionResult> UpdateProfile(string id)
         {
-            // Ensure the user is accessing their own profile.
+            // التحقق من مطابقة المستخدم
             if (string.IsNullOrEmpty(id) || id != _userManager.GetUserId(User))
             {
+                await _signInManager.SignOutAsync();
                 return RedirectToAction("Login");
             }
 
-            // Retrieve the user from the database.
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Create a view model and pre-fill with user data.
             var model = new UpdateProfileViewModel
             {
+                Id = user.Id,
                 Email = user.Email,
                 Name = user.Name,
-                cImage = user.ImageUser,
-                // The ChangePassword object can be initialized here if needed.
+                CurrentImage = user.ImageUser // تخزين الصورة الحالية
             };
 
             return View(model);
@@ -125,66 +128,98 @@ namespace MyService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfile(UpdateProfileViewModel model)
         {
-            // Check if the submitted model is valid.
             if (!ModelState.IsValid)
             {
-                // Aggregate errors and pass via TempData.
-                var errors = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                TempData["ErrorMessage"] = errors;
                 return View(model);
             }
 
-            // Retrieve the current user's ID.
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null || user.Id != _userManager.GetUserId(User))
             {
-                TempData["ErrorMessage"] = "User is not logged in.";
-                return RedirectToAction("Login", "Customer");
-            }
-
-            // Retrieve the user from the database.
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                TempData["ErrorMessage"] = "User not found.";
                 return NotFound();
             }
 
-            var file = HttpContext.Request.Form.Files;
-            if (file.Count > 0)
+            // التحقق من البريد الإلكتروني الجديد في حال تغييره
+            if (user.Email != model.Email)
             {
-                string imageName = Guid.NewGuid().ToString() + Path.GetExtension(file[0].FileName);
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", Helper.PathSaveImageuser, imageName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                var emailExists = await _userManager.FindByEmailAsync(model.Email);
+                if (emailExists != null)
                 {
-                    await file[0].CopyToAsync(fileStream);
+                    ModelState.AddModelError("Email", "البريد الإلكتروني مستخدم بالفعل");
+                    return View(model);
                 }
+            }
+
+            // تحديث الصورة في حال تم رفع ملف
+            if (HttpContext.Request.Form.Files.Count > 0)
+            {
+                var file = HttpContext.Request.Form.Files[0];
+                string imageName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                string filePath = Path.Combine("wwwroot", Helper.PathSaveImageuser, imageName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                // تحديث الخاصية الخاصة بصورة المستخدم
                 user.ImageUser = imageName;
+                model.CurrentImage = imageName;
             }
-            user.UserName = model.Name;
+            // وإلا يتم الاحتفاظ بالصورة الحالية دون تغيير
+
+            // تحديث البيانات الأساسية
+            user.Name = model.Name;
             user.Email = model.Email;
-            if (user is ApplicationUser appUser)
+            user.UserName = model.Email;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
             {
-                appUser.Name = model.Name;
+                AddErrorsToModelState(updateResult.Errors);
+                return View(model);
             }
 
-            // Save updates to the database.
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            // تحديث كلمة المرور إن كان المستخدم يريد تغييرها
+            if (!string.IsNullOrEmpty(model.PasswordUpdate?.NewPassword))
             {
-                TempData["SuccessMessage"] = "Profile updated successfully!";
-                return RedirectToAction("Index", "Home");
+                if (model.PasswordUpdate.NewPassword != model.PasswordUpdate.ComparePassword)
+                {
+                    ModelState.AddModelError("PasswordUpdate.ComparePassword", "كلمات المرور غير متطابقة");
+                    return View(model);
+                }
+
+                // يجب استخدام الحقل المخصص لكلمة المرور الحالية لتغيير كلمة المرور
+                var changeResult = await _userManager.ChangePasswordAsync(
+                    user,
+                    model.PasswordUpdate.CurrentPassword, // استخدام كلمة المرور الحالية
+                    model.PasswordUpdate.NewPassword
+                );
+
+                if (!changeResult.Succeeded)
+                {
+                    AddErrorsToModelState(changeResult.Errors);
+                    return View(model);
+                }
             }
 
-            TempData["ErrorMessage"] = string.Join(" ", result.Errors.Select(e => e.Description));
-            return View(model);
+            TempData["SuccessMessage"] = "تم تحديث الملف الشخصي بنجاح";
+            return RedirectToAction("Index", "Home");
         }
 
+        // دالة مساعدة لإضافة الأخطاء
+        private void AddErrorsToModelState(IEnumerable<IdentityError> errors)
+        {
+            foreach (var error in errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
 
+        // نموذج الفيو المحدث
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> ChangePassword(UpdateProfileViewModel model)
+        public async Task<IActionResult> ChangePassword(RegisterViewModel model)
         {
             var user = await _userManager.FindByIdAsync(model.ChangePassword.Id);
             if (user != null)

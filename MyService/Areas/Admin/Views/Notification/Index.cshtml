@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Domin.Entity.Notification>
+
+@foreach (var notification in Model)
+{
+    <div class="dropdown-divider"></div>
+    <a href="@Url.Action("Details", "Notification", new { id = notification.NotificationId, area = "Admin" })" class="dropdown-item">
+        <!-- Message Start -->
+        <div class="media">
+            <img src="@(notification.Customer?.Username ?? "~/Admin/dist/img/default-avatar.jpg")" alt="User Avatar" class="img-size-50 img-circle mr-3">
+            <div class="media-body">
+                <h3 class="dropdown-item-title">
+                    @(notification.Customer?.Username ?? "Unknown")
+                    <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">@notification.Message</p>
+                <p class="text-sm text-muted">
+                    <i class="far fa-clock mr-1"></i> @notification.CreatedAt.ToString("t")
+                </p>
+            </div>
+        </div>
+        <!-- Message End -->
+    </a>
+}
+<div class="dropdown-divider"></div>
+<a href="@Url.Action("Index", "Notification", new { area = "Admin" })" class="dropdown-item dropdown-footer">See All Notifications</a>

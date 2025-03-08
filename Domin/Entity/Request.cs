@@ -30,7 +30,6 @@ namespace Domin.Entity
 
         public virtual Provider Provider { get; set; }
 
-
         
     }
 }

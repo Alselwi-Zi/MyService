@@ -7,8 +7,11 @@
         document.getElementById("CreatedAt").value = new Date(date).toISOString().split("T")[0];
     } else {
         document.getElementById("CreatedAt").value = "";
-    } var activeCheckbox = document.getElementById("IsActive");
-    activeCheckbox.checked = active === "True";
+    } var Active = document.getElementById("ServiceActive");
+    if (active == "True")
+        Active.checked = true;
+    else
+        Active.checked = false;
     document.getElementById("serviceModalLabel").innerHTML = lbTitleEdit;
 };
 
@@ -17,6 +20,6 @@ function Rest() {
     document.getElementById("Name").value = "";
     document.getElementById("Description").value = "";
     document.getElementById("CreatedAt").value = "";
-    document.getElementById("IsActive").checked = false;
+    document.getElementById("ServiceActive").checked = false;
     document.getElementById("serviceModalLabel").innerHTML = lbTitleAdd;
 }

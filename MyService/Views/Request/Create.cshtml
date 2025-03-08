@@ -1,88 +1,79 @@
 ﻿@model RequestViewModel
 
 @{
-    ViewData["Title"] = "إضافة طلب جديد";
+    ViewData["Title"] = "Send Request";
 }
-<style>
-    .top {
-        margin-top: 120px; /* تقليل المسافة من 200px إلى 120px */
-        padding: 30px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
 
-    .Container {
-        width:90%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-
-<div class="Container">
-    <div class="content-wrapper top">
-
-    <h1>@ViewData["Title"]</h1>
-
-    <form asp-action="Create" >
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="CustomerId" class="control-label"></label>
-                    <select asp-for="CustomerId" class="form-control"
-                            asp-items="@(new SelectList(Model.Customers, "CustomerId", "Username"))">
-                        <option value="">اختر العميل</option>
-                    </select>
-                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title mb-0">Send Request</h2>
                 </div>
+                <div class="card-body">
+                    <form asp-action="SendRequest" method="post">
+                        @Html.AntiForgeryToken()
 
-                <div class="form-group">
-                    <label asp-for="ProviderId" class="control-label"></label>
-                    <select asp-for="ProviderId" class="form-control"
-                            asp-items="@(new SelectList(Model.Providers, "ProviderId", "ProviderName"))">
-                        <option value="">اختر المزود</option>
-                    </select>
-                    <span asp-validation-for="ProviderId" class="text-danger"></span>
-                </div>
+                        <div class="form-group">
+                            <label asp-for="CustomerId" class="control-label"></label>
+                            <select asp-for="CustomerId" class="form-control"
+                                    asp-items="@(new SelectList(Model.Customers, "CustomerId", "Username"))">
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="ServiceId" class="control-label"></label>
-                    <select asp-for="ServiceId" class="form-control"
-                            asp-items="@(new SelectList(Model.Services, "ServiceID", "Name"))">
-                        <option value="">اختر الخدمة</option>
-                    </select>
-                    <span asp-validation-for="ServiceId" class="text-danger"></span>
-                </div>
-            </div>
+                        <div class="form-group">
+                            <label asp-for="ProviderId" class="control-label"></label>
+                            <select asp-for="ProviderId" class="form-control"
+                                    asp-items="@(new SelectList(Model.Providers, "ProviderId", "ProviderName"))">
+                                <option value="">-- Select Provider --</option>
+                            </select>
+                            <span asp-validation-for="ProviderId" class="text-danger"></span>
+                        </div>
 
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="OrderDate" class="control-label"></label>
-                    <input asp-for="OrderDate" class="form-control" />
-                    <span asp-validation-for="OrderDate" class="text-danger"></span>
-                </div>
+                        <div class="form-group">
+                            <label asp-for="ServiceId" class="control-label"></label>
+                            <select asp-for="ServiceId" class="form-control"
+                                    asp-items="@(new SelectList(Model.Services, "ServiceID", "Name"))">
+                                <option value="">-- Select Service --</option>
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger"></span>
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="Status" class="control-label"></label>
-                    <div class="form-check">
-                        <input class="form-check-input" asp-for="Status" />
-                        <label class="form-check-label" asp-for="Status"></label>
-                    </div>
-                </div>
+                        <div class="form-group">
+                            <label asp-for="OrderDate" class="control-label"></label>
+                            <input asp-for="OrderDate" type="date" class="form-control" />
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="Comment" class="control-label"></label>
-                    <textarea asp-for="Comment" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Comment" class="text-danger"></span>
+                        <div class="form-group">
+                            <label asp-for="Status" class="control-label"></label>
+                            <select asp-for="Status" class="form-control">
+                                <option value="false">Pending</option>
+                                <option value="true">Completed</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Comment" class="control-label"></label>
+                            <textarea asp-for="Comment" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-success">Send Request</button>
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ml-2">Cancel</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="form-group mt-4">
-            <button type="submit" class="btn btn-primary">حفظ</button>
-            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
-        </div>
-    </form>
-</div>
-</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

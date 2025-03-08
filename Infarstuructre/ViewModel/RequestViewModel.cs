@@ -8,38 +8,39 @@ using System.ComponentModel.DataAnnotations;
 namespace Infarstuructre.ViewModel
 {
     
-
    
         public class RequestViewModel
         {
+
             public int RequestId { get; set; }
 
-            [Required(ErrorMessage = "العميل مطلوب")]
-            [Display(Name = "العميل")]
+            [Required]
+            [Display(Name = "Customer")]
             public int CustomerId { get; set; }
 
-            [Required(ErrorMessage = "المزود مطلوب")]
-            [Display(Name = "المزود")]
+            [Required]
+            [Display(Name = "Provider")]
             public int ProviderId { get; set; }
 
-            [Required(ErrorMessage = "الخدمة مطلوبة")]
-            [Display(Name = "الخدمة")]
+            [Required]
+            [Display(Name = "Service")]
             public int ServiceId { get; set; }
 
-            [Required(ErrorMessage = "تاريخ الطلب مطلوب")]
-            [Display(Name = "تاريخ الطلب")]
-            public DateTime OrderDate { get; set; } = DateTime.Now;
+            [Required]
+            [DataType(DataType.Date)]
+            [Display(Name = "Order Date")]
+            public DateTime OrderDate { get; set; }
 
-            [Display(Name = "الحالة")]
+            [Required]
             public bool Status { get; set; }
 
-            [Display(Name = "ملاحظات")]
             public string Comment { get; set; }
 
-            // Dropdown lists
-            public List<Customer> Customers { get; set; }
-            public List<Provider> Providers { get; set; }
-            public List<Service> Services { get; set; }
+            // Collections to populate dropdowns in the view
+            public IEnumerable<Customer> Customers { get; set; }
+            public IEnumerable<Provider> Providers { get; set; }
+            public IEnumerable<Service> Services { get; set; }
         }
     }
+
 

@@ -56,6 +56,13 @@
             display: block;
             margin: 10px auto;
         }
+
+        .password-section {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -78,22 +85,68 @@
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
-                    <!-- Change Password Button -->
-                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-                        @ResourceWeb.lbbtnChangePassword
-                    </button>
+                    <!-- Optional Password Change Section -->
+                    <div class="password-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Change Password</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    onclick="togglePasswordFields()">
+                                <i class="fas fa-edit"></i> Change
+                            </button>
+                        </div>
+                        <div id="passwordFields" style="display: none;">
+                            <div class="mb-3">
+                                <label asp-for="PasswordUpdate.CurrentPassword" class="form-label">Current Password</label>
+                                <div class="input-group">
+                                    <input asp-for="PasswordUpdate.CurrentPassword" type="password"
+                                           class="form-control" placeholder="Enter current password" />
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            onclick="togglePasswordVisibility(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="PasswordUpdate.CurrentPassword" class="text-danger"></span>
+                            </div>
 
-                  -->
+                            <div class="mb-3">
+                                <label asp-for="PasswordUpdate.NewPassword" class="form-label">New Password</label>
+                                <div class="input-group">
+                                    <input asp-for="PasswordUpdate.NewPassword" type="password"
+                                           class="form-control" placeholder="Enter new password" />
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            onclick="togglePasswordVisibility(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="PasswordUpdate.NewPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PasswordUpdate.ComparePassword" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <input asp-for="PasswordUpdate.ComparePassword" type="password"
+                                           class="form-control" placeholder="Confirm new password" />
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            onclick="togglePasswordVisibility(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="PasswordUpdate.ComparePassword" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
                     <!-- Profile Image Upload Field -->
                     <div class="mb-3">
                         <label class="form-label">Profile Image</label>
-                        <input type="file" asp-for="cImage" class="form-control" id="userImage" name="ProfileImage" accept="image/*" onchange="previewImage(event)" />
+                        <input type="file" name="ProfileImage" class="form-control"
+                               id="userImage" accept="image/*" onchange="previewImage(event)" />
                     </div>
 
                     <!-- Image Preview -->
                     <div class="mb-3 text-center">
                         <img id="profileImagePreview"
-                             src="@Url.Content(string.IsNullOrEmpty(Model.cImage) ? "~/img/testimonial-3.jpg" : "~/" + Helper.PathSaveImageuser + "/" + Model.cImage)"
+                             src="@Url.Content(string.IsNullOrEmpty(Model.CurrentImage) ? "~/img/testimonial-3.jpg" : "~/" + Helper.PathSaveImageuser + "/" + Model.CurrentImage)"
                              alt="Profile Image Preview"
                              class="img-preview" />
                     </div>
@@ -108,45 +161,46 @@
     </div>
 
     <!-- Scripts -->
-    <!-- jQuery (required for Toastr) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        // Function to preview the selected profile image
-        function previewImage(event) {
-            const imagePreview = document.getElementById('profileImagePreview');
-            imagePreview.src = URL.createObjectURL(event.target.files[0]);
-            imagePreview.onload = () => URL.revokeObjectURL(imagePreview.src);
+        // Toggle password fields visibility
+        function togglePasswordFields() {
+            const fields = document.getElementById('passwordFields');
+            fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Toggle password visibility for the inputs in the modal
-        function togglePasswordVisibility(element) {
-            var input = element.parentElement.querySelector("input");
-            if (input.type === "password") {
-                input.type = "text";
-                element.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        // Toggle password input type
+        function togglePasswordVisibility(btn) {
+            const input = btn.parentElement.querySelector('input');
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                input.type = "password";
-                element.innerHTML = '<i class="fas fa-eye"></i>';
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
 
-        // Display Toastr notifications if TempData contains messages
+        // Image preview handler
+        function previewImage(event) {
+            const reader = new FileReader();
+            const preview = document.getElementById('profileImagePreview');
+            reader.onload = () => preview.src = reader.result;
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Toastr notifications
         $(document).ready(function () {
         @if (TempData["ErrorMessage"] != null)
         {
-            <text>
-                        toastr.error('@TempData["ErrorMessage"]');
-            </text>
+            <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])');</text>
         }
         @if (TempData["SuccessMessage"] != null)
         {
-            <text>
-                        toastr.success('@TempData["SuccessMessage"]');
-            </text>
+            <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])');</text>
         }
         });
     </script>
