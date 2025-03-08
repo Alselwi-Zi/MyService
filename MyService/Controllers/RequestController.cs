@@ -40,7 +40,7 @@ namespace MyService.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Customer");
             }
             }
         
